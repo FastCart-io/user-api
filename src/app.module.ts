@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { MongoUri_s } from './interfaces/mongo.interface';
 import { AuthService } from './auth/auth.service';
 import { AuthController } from './auth/auth.controller';
+import { AuthModule } from './auth/auth.module';
 
 import configuration from './config/configuration';
 
@@ -33,8 +34,9 @@ import configuration from './config/configuration';
     }),
 
     UserModule,
+    AuthModule,
   ],
-  controllers: [AppController, AuthController],
-  providers: [AppService, AuthService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
