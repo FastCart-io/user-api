@@ -38,9 +38,29 @@ export class UserService {
         return newUser;
     }
 
-    public async delete() { throw new Error('not Implemented'); }
+    public async delete(account: Account): Promise<Account> | null {
 
-    public async update() { throw new Error('not Implemented'); }
+        const user = await this.userModel.findOneAndDelete(account).exec();
+
+        if (user) return new Account(user);
+
+        return null
+    }
+
+    public async update(account: Account, data: Partial<Account>): Promise<Account> {
+
+        const user = await this.userModel.findOneAndUpdate(account, data).exec();
+
+        try {
+
+            await user.save();
+        } catch(error) {
+
+            throw new Error(error);
+        }
+
+        return new Account(user);
+    }
 
     public async findOnebyEmail(
         email: string,
@@ -60,6 +80,13 @@ export class UserService {
 
         if (user) return new Account(user);
         return null
+    }
+
+    public async findOne(account: Account): Promise<Account> | null {
+
+        const user: User = await this.userModel.findOne(account).exec();
+
+        if (user) return account
     }
 
     public async getUsers(): Promise<Account[]> | null {
