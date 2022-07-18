@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 
 import { User } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
-import { RegisterDto } from './dto/user.dto';
+import { Account, RegisterDto } from './dto/user.dto';
 
 type credentialType = 'username' | 'email' | 'id';
 
@@ -44,28 +44,36 @@ export class UserService {
 
     public async findOnebyEmail(
         email: string,
-    ): Promise<User> | null{
+    ): Promise<Account> | null{
 
         const user: User = await this.userModel.findOne({ email: email }).exec();
-        if (user) return user;
+        if (user) return new Account(user);
 
         else return null;
     }
 
     public async findOnebyUserName(
         username: string,
-    ): Promise<User> | null {
+    ): Promise<Account> | null {
 
         const user: User = await this.userModel.findOne({ username: username }).exec();
-        if (user) return user;
 
+        if (user) return new Account(user);
         return null
     }
 
-    public async getUsers(): Promise<User[]> | null {
+    public async getUsers(): Promise<Account[]> | null {
 
         const userList: User[] = await this.userModel.find({}).exec();
-        if (userList) return userList;
+
+
+        if (userList) {
+
+            return userList.flatMap((item) => {
+
+                return [new Account(item)];
+            });
+        }
 
         else return null;
     }
