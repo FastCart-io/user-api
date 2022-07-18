@@ -1,4 +1,4 @@
-import { DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger';
+import { DocumentBuilder, ExpressSwaggerCustomOptions, SwaggerCustomOptions } from '@nestjs/swagger';
 
 export const ConfigDocument = new DocumentBuilder()
   .setTitle("Todo Cart Api's")
@@ -10,7 +10,7 @@ export const ConfigDocument = new DocumentBuilder()
   .addBearerAuth()
   .build();
 
-export const Options = {
+export const Options: ExpressSwaggerCustomOptions = {
   explorer: true,
   swaggerOptions: {
     deepScanRoutes: true,

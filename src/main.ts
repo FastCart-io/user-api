@@ -5,12 +5,15 @@ import { SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { ConfigDocument, Options } from './config/swagger.config';
+import { getLevel } from './utils/logger.class';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: getLevel(process.env.NODE_ENV),
+    cors: true,
+  });
   const config = app.get<ConfigService>(ConfigService);
 
-  console.log('config' + config);
   const document = SwaggerModule.createDocument(
     app,
     ConfigDocument,
