@@ -12,6 +12,7 @@ import { ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { LocalGuard } from 'src/guard/local.guard';
 import { Account } from './dto/user.dto';
+import { JwtGuard } from 'src/guard/jwt.guard';
 
 @ApiTags('user')
 @Controller('user')
@@ -19,6 +20,8 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('/me')
+  @UseGuards(JwtGuard)
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   public async getUser(@Request() req): Promise<any> {
     return {
       status: 'sucess',
@@ -38,6 +41,8 @@ export class UserController {
   }
 
   @Patch('/me')
+  @UseGuards(JwtGuard)
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   public async updateUser(@Request() req, @Body() body: any): Promise<any> {
     const updatedAcc = await this.userService.update(req.user, body);
 
@@ -50,6 +55,8 @@ export class UserController {
   }
 
   @Patch('/me/password')
+  @UseGuards(JwtGuard)
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   public async updatePassword(@Request() req, @Body() body: any) {
     const { pass, oldPass } = body;
 
