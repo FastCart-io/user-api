@@ -6,8 +6,6 @@ import { User } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
 import { Account, RegisterDto } from './dto/user.dto';
 
-type credentialType = 'username' | 'email' | 'id';
-
 @Injectable()
 export class UserService {
 
@@ -58,6 +56,16 @@ export class UserService {
 
             throw new Error(error);
         }
+
+        return new Account(user);
+    }
+
+    public async updatePassword(account: Account, oldPass: string, newPass: string) {
+
+        // check if diff of past password, check pass validity ?
+        const user = await this.update(account, { password: newPass });
+
+        if (!user) return null;
 
         return new Account(user);
     }
