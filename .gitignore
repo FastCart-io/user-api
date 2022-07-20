@@ -37,3 +37,8 @@ lerna-debug.log*
 # docker
 .docker/data/
 .docker/data/db/
+
+#env
+.env.local
+.env.*
+.env
