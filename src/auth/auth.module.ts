@@ -1,51 +1,51 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 
 import configuration from 'src/config/configuration';
 import { Jwt_s } from 'src/interfaces/jwt.interface';
+import { UserSchema } from 'src/schema/user.schema';
 import { UserModule } from 'src/user/user.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { LocalCredentialService } from './services/local-credential.service';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
-    providers: [AuthService],
-    imports: [
-        ConfigModule.forRoot({
-            load: [configuration],
-            isGlobal: true,
-        }),
+  providers: [AuthService, LocalCredentialService, JwtStrategy],
 
-        PassportModule.registerAsync({
-            useFactory: async (configService: ConfigService) => {
+  imports: [
+    ConfigModule.forRoot({
+      load: [configuration],
+      isGlobal: true,
+    }),
 
-                const jwtConfig = configService.get<Jwt_s>('jwt');
-                return {
-                    secret: jwtConfig.secret,
-                    signOptions: { expiresIn: jwtConfig.expiresIn }
-                }
-            },
+    PassportModule,
 
-            inject: [ConfigService]
-        }),
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => {
+        const jwtConfig = configService.get<Jwt_s>('jwt');
+        return {
+          secret: jwtConfig.secret,
+          signOptions: { expiresIn: jwtConfig.expiresIn },
+        };
+      },
 
-        JwtModule.registerAsync({
-            useFactory: async (configService: ConfigService) => {
+      inject: [ConfigService],
+    }),
 
-                const jwtConfig = configService.get<Jwt_s>('jwt');
-                return {
-                    secret: jwtConfig.secret,
-                    signOptions: { expiresIn: jwtConfig.expiresIn }
-                }
-            },
+    MongooseModule.forFeature([
+      {
+        name: 'User',
+        schema: UserSchema,
+      },
+    ]),
 
-            inject: [ConfigService]
-        }),
-
-        UserModule,
-    ],
-    exports: [AuthService],
-    controllers: [AuthController]
+    UserModule,
+  ],
+  exports: [AuthService],
+  controllers: [AuthController],
 })
 export class AuthModule {}

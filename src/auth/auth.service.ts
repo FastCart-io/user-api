@@ -10,29 +10,37 @@ import { refreshData } from 'src/types/refresh.type';
 import { encryptObject } from 'src/utils/encryption.tools';
 import { IUser } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
+import { LocalCredentialService } from './services/local-credential.service';
 
 @Injectable()
 export class AuthService {
 
     constructor(
         private readonly userService: UserService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly localCredential: LocalCredentialService
     ) {}
 
-    public async login(loginDto: any): Promise<DataPayload> {
+    public async login(loginDto: any): Promise<DataPayload> | null {
 
-        let user: Account | null = validateEmail(loginDto.credential) ?
+        let user: Partial<Account> | null = validateEmail(loginDto.credential) ?
             await this.userService.findOnebyEmail(loginDto.credential) :
             await this.userService.findOnebyUserName(loginDto.credential);
 
-        if (!user) throw new Error('user not found');
+        if (!user) return null
 
-        // localCredential to check userData;
+        const account = await this.localCredential.validate({
 
-        return await this.generateJwt(user);
+            identifier: loginDto.credential,
+            password: loginDto.password
+        });
+
+        if(!account) return null;
+
+        return await this.generateJwt(account);
     }
 
-    public async validatePayload(payload: AccessPayload): Promise<IUser | null> {
+    public async validatePayload(payload: AccessPayload): Promise<Partial<IUser> | null> {
 
         return await this.userService.findOnebyUserName(payload.username);
     }
@@ -57,6 +65,8 @@ export class AuthService {
             token: this.jwtService.sign(payload),
             refresh: encryptObject(refreshToken)
         };
+
+       // console.log(dataPaylaod);
 
         return dataPaylaod;
     }

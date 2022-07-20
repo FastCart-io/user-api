@@ -6,8 +6,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { MongoUri_s } from './interfaces/mongo.interface';
-import { AuthService } from './auth/auth.service';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 
 import configuration from './config/configuration';
@@ -26,7 +24,7 @@ import configuration from './config/configuration';
 
         return {
           uri: `mongodb://${dbConfig.user}:${dbConfig.passwd}@${dbConfig.host}:${dbConfig.port}`,
-          dbName: '2doCarts',
+          dbName: dbConfig.dbname,
         };
       },
 

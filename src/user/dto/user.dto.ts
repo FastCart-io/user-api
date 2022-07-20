@@ -31,7 +31,26 @@ export class RegisterDto {
     email: string;
 }
 
-export class Account implements Partial<User> {
+export class LoginDto {
+
+     @ApiProperty({
+        type: String,
+        description: 'Username or password',
+        required: true,
+        example: 'test'
+    })
+    credential: string;
+
+    @ApiProperty({
+        type: String,
+        description: 'Password',
+        required: true,
+        example: 'verystrongpassword'
+    })
+    password: string;
+}
+
+export class Account {
 
     username: string;
     email: string;
@@ -42,6 +61,7 @@ export class Account implements Partial<User> {
     password: string;
 
     constructor(partial: Partial<Account>) {
+
         Object.assign(this, partial);
     }
 }

@@ -58,7 +58,6 @@ UserSchema.pre<User>('save', function(next) {
         const hash = Bcrypt.hashSync(user.password, salt);
 
         user.password = hash;
-        user.save();
         next();
     } catch(err) {
 

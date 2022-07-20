@@ -17,3 +17,9 @@ export interface DataPayload {
     token: string;
     refresh: string;
 }
+
+export interface FullJwtPayload extends AccessPayload {
+
+    iat: number;
+    exp: number;
+}

@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { RequestMethod } from '@nestjs/common';
+import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
@@ -12,6 +12,10 @@ async function bootstrap() {
     logger: getLevel(process.env.NODE_ENV),
     cors: true,
   });
+
+  app.enableCors();
+  app.setGlobalPrefix('api/v1');
+
   const config = app.get<ConfigService>(ConfigService);
 
   const document = SwaggerModule.createDocument(
@@ -20,16 +24,8 @@ async function bootstrap() {
     Options.swaggerOptions,
   );
 
-  app.setGlobalPrefix('api/v1', {
-    exclude: [
-      {
-        path: 'swagger',
-        method: RequestMethod.GET,
-      },
-    ],
-  });
 
-  SwaggerModule.setup('swagger', app, document, Options);
+  SwaggerModule.setup('/api/v1/docs', app, document, Options);
   await app.listen(config.get<number>('PORT'));
 }
 
