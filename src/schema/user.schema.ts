@@ -2,6 +2,7 @@ import * as Bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
 
 import { IUserModel, User } from 'src/interfaces/user.interface';
+import { Jwt_s } from 'src/interfaces/jwt.interface';
 import validateEmail from 'src/middleware/email.checker';
 
 export const UserSchema: Schema = new Schema({

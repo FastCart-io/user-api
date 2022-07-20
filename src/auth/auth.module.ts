@@ -13,11 +13,10 @@ import { AuthService } from './auth.service';
     providers: [AuthService],
     imports: [
         ConfigModule.forRoot({
-        load: [configuration],
-        isGlobal: true,
+            load: [configuration],
+            isGlobal: true,
         }),
 
-        UserModule,
         PassportModule.registerAsync({
             useFactory: async (configService: ConfigService) => {
 
@@ -43,6 +42,8 @@ import { AuthService } from './auth.service';
 
             inject: [ConfigService]
         }),
+
+        UserModule,
     ],
     exports: [AuthService],
     controllers: [AuthController]
