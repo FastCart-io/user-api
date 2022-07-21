@@ -30,7 +30,6 @@ UserSchema.statics.validateEmail = (email: string) => (validateEmail(email));
 UserSchema.methods.validatePassword = function(password: string): Promise<Boolean> {
 
     const user = this;
-
     return new Promise((resolve, reject) => {
 
         try {
@@ -43,6 +42,34 @@ UserSchema.methods.validatePassword = function(password: string): Promise<Boolea
             throw new Error(err);
         }
     });
+}
+
+UserSchema.methods.updatePassword = function(oldPassword: string, newPassword: string): Promise<Boolean> {
+
+    const user = this;
+
+    return new Promise(async (resolve, reject) => {
+
+        try {
+
+            if (!await user.validatePassword(oldPassword))
+                resolve(false);
+
+            if (await user.validatePassword(newPassword))
+                resolve(false);
+
+            user.password = newPassword;
+            await user.save();
+
+            resolve(true);
+        } catch(err) {
+
+            reject(err);
+            throw new Error(err);
+        }
+
+    })
+
 }
 
 UserSchema.pre<User>('save', function(next) {

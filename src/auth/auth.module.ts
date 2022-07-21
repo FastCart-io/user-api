@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -14,38 +14,38 @@ import { LocalCredentialService } from './services/local-credential.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
-  providers: [AuthService, LocalCredentialService, JwtStrategy],
+    providers: [AuthService, LocalCredentialService, JwtStrategy],
 
-  imports: [
-    ConfigModule.forRoot({
-      load: [configuration],
-      isGlobal: true,
-    }),
+    imports: [
+        ConfigModule.forRoot({
+            load: [configuration],
+            isGlobal: true,
+        }),
 
-    PassportModule,
+        PassportModule,
 
-    JwtModule.registerAsync({
-      useFactory: async (configService: ConfigService) => {
-        const jwtConfig = configService.get<Jwt_s>('jwt');
-        return {
-          secret: jwtConfig.secret,
-          signOptions: { expiresIn: jwtConfig.expiresIn },
-        };
-      },
+        JwtModule.registerAsync({
+            useFactory: async (configService: ConfigService) => {
+                const jwtConfig = configService.get<Jwt_s>('jwt');
+                return {
+                    secret: jwtConfig.secret,
+                    signOptions: { expiresIn: jwtConfig.expiresIn },
+                };
+            },
 
-      inject: [ConfigService],
-    }),
+            inject: [ConfigService],
+        }),
 
-    MongooseModule.forFeature([
-      {
-        name: 'User',
-        schema: UserSchema,
-      },
-    ]),
+        MongooseModule.forFeature([
+            {
+                name: 'User',
+                schema: UserSchema,
+            },
+        ]),
 
-    UserModule,
-  ],
-  exports: [AuthService],
-  controllers: [AuthController],
+        forwardRef(() => UserModule),
+    ],
+    exports: [AuthService, LocalCredentialService],
+    controllers: [AuthController],
 })
 export class AuthModule {}

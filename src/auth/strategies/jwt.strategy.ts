@@ -24,7 +24,6 @@ class JwtStrategy extends PassportStrategy(Strategy) {
     public async validate(payload: FullJwtPayload) {
 
         const account = await this.userService.findOnebyUserName(payload.username)
-        //console.log(payload);
 
         if (!account)
             throw new UnauthorizedException('Invalid JWT subject')

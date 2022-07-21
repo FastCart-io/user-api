@@ -4,6 +4,7 @@ import { Model } from "mongoose";
 
 import { IUser, User } from "src/interfaces/user.interface";
 import validateEmail from "src/middleware/email.checker";
+import { UserModel } from "src/schema/user.schema";
 import { Account } from "src/user/dto/user.dto";
 
 interface Credentials {
@@ -21,12 +22,11 @@ class LocalCredentialService {
 
     public async findOne(credential: string):Promise<User | null> {
 
-        const user = validateEmail(credential)
+        const user: User = validateEmail(credential)
             ? await this.userModel.findOne({ email: credential }).exec()
             : await this.userModel.findOne({ username: credential }).exec()
 
         if(!user) return null;
-
         return user;
     }
 
@@ -37,12 +37,25 @@ class LocalCredentialService {
             password
         } = credentials;
 
-
         const user = await this.findOne(identifier);
-        if(!user.validatePassword(password))
+
+        if(!await user.validatePassword(password))
             return null
 
-        return new Account(user);
+        const {
+            username,
+            email,
+            createdAt,
+            personalInfo,
+        } = user;
+
+        return new Account({
+            username: username,
+            email: email,
+            password: password,
+            createdAt: createdAt,
+            personalInfo: personalInfo
+        });
     }
 }
 

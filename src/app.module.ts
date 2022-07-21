@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -11,30 +11,30 @@ import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: ['.env.local'],
-      load: [configuration],
-      isGlobal: true,
-    }),
+    imports: [
+        ConfigModule.forRoot({
+            envFilePath: ['.env.local'],
+            load: [configuration],
+            isGlobal: true,
+        }),
 
-    MongooseModule.forRootAsync({
-      useFactory: async (configService: ConfigService) => {
-        const dbConfig = configService.get<MongoUri_s>('database');
+        MongooseModule.forRootAsync({
+            useFactory: async (configService: ConfigService) => {
+                const dbConfig = configService.get<MongoUri_s>('database');
 
-        return {
-          uri: `mongodb://${dbConfig.user}:${dbConfig.passwd}@${dbConfig.host}:${dbConfig.port}`,
-          dbName: dbConfig.dbname,
-        };
-      },
+                return {
+                    uri: `mongodb://${dbConfig.user}:${dbConfig.passwd}@${dbConfig.host}:${dbConfig.port}`,
+                    dbName: dbConfig.dbname,
+                };
+            },
 
-      inject: [ConfigService],
-    }),
+            inject: [ConfigService],
+        }),
 
-    UserModule,
-    AuthModule,
-  ],
-  controllers: [AppController],
-  providers: [AppService],
+        UserModule,
+        AuthModule,
+    ],
+    controllers: [AppController],
+    providers: [AppService],
 })
 export class AppModule {}

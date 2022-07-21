@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt'
 
 import { UserService } from 'src/user/user.service';
-import { Account } from 'src/user/dto/user.dto';
+import { Account, LoginDto } from 'src/user/dto/user.dto';
 import { AccessPayload, DataPayload } from 'src/interfaces/payload.interface';
 import { refreshData } from 'src/types/refresh.type';
 import { encryptObject } from 'src/utils/encryption.tools';
@@ -21,7 +21,7 @@ export class AuthService {
         private readonly localCredential: LocalCredentialService
     ) {}
 
-    public async login(loginDto: any): Promise<DataPayload> | null {
+    public async login(loginDto: LoginDto): Promise<DataPayload> | null {
 
         let user: Partial<Account> | null = validateEmail(loginDto.credential) ?
             await this.userService.findOnebyEmail(loginDto.credential) :
@@ -36,7 +36,6 @@ export class AuthService {
         });
 
         if(!account) return null;
-
         return await this.generateJwt(account);
     }
 
@@ -65,8 +64,6 @@ export class AuthService {
             token: this.jwtService.sign(payload),
             refresh: encryptObject(refreshToken)
         };
-
-       // console.log(dataPaylaod);
 
         return dataPaylaod;
     }

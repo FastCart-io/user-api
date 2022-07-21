@@ -12,6 +12,7 @@ export interface User extends IUser, Document {
 
     password: string;
     validatePassword(password: string): Promise<boolean>;
+    updatePassword(oldPassword: string, newPassword: string): Promise<boolean>;
 }
 
 export interface IUserModel extends Model<User> {

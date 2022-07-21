@@ -15,8 +15,8 @@ import {
 } from '@nestjs/swagger';
 
 import { UserService } from './user.service';
-import { LocalGuard } from 'src/auth/guard/local.guard';
 import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { ReqUpdatePassDto, ReqUpdateUserDto } from './dto/request.dto';
 
 @ApiTags('user')
 @Controller('user')
@@ -52,9 +52,9 @@ export class UserController {
     @Patch('/me')
     @UseGuards(JwtGuard)
     @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-    public async updateUser(@Request() req, @Body() body: any): Promise<any> {
+    public async updateUser(@Request() req, @Body() body: ReqUpdateUserDto): Promise<any> {
 
-        const updatedAcc = await this.userService.update(req.user, body);
+        const updatedAcc = await this.userService.update(req.user, body.data);
         if (!updatedAcc) throw new HttpException('user not found', 400);
 
         return {
@@ -66,13 +66,14 @@ export class UserController {
     }
 
     @Patch('/me/password')
-    //@UseGuards(JwtGuard)
+    @UseGuards(JwtGuard)
     @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-    public async updatePassword(@Request() req, @Body() body: any) {
-        const { pass, oldPass } = body;
+    public async updatePassword(@Request() req, @Body() body: ReqUpdatePassDto) {
 
-        const account = await this.userService.updatePassword(req.user, oldPass, pass);
-        if (!account) throw new  HttpException('user not found', 400);
+        const { password, newPassword } = body;
+        const account = await this.userService.updatePassword(req.user, password, newPassword);
+
+        if (!account) throw new HttpException('user not found', 400);
         return { status: 'success' };
     }
 }
