@@ -7,7 +7,7 @@ import { UserService } from 'src/user/user.service';
 import { Account, LoginDto } from 'src/user/dto/user.dto';
 import { AccessPayload, DataPayload } from 'src/interfaces/payload.interface';
 import { refreshData } from 'src/types/refresh.type';
-import { encryptObject } from 'src/utils/encryption.tools';
+import { decryptObject, encryptObject } from 'src/utils/encryption.tools';
 import { IUser } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
 import { LocalCredentialService } from './services/local-credential.service';
@@ -34,16 +34,26 @@ export class AuthService {
             identifier: loginDto.credential,
             password: loginDto.password
         });
+    
+        const { username, password, createdAt, personalInfo } = account;
 
         if(!account) return null;
-        return await this.generateJwt(account);
+        const acc = new Account({
+            username: username,
+            password: password,
+            createdAt: createdAt,
+            personalInfo: personalInfo
+        });
+
+        return await this.generateJwt(acc);
     }
 
     public async validatePayload(payload: AccessPayload): Promise<Partial<IUser> | null> {
 
         return await this.userService.findOnebyUserName(payload.username);
     }
-
+    
+    // refreshData[token] field need ha more explicit name
     public async generateJwt(account: Partial<Account>) {
 
         const payload: AccessPayload = {
@@ -53,9 +63,10 @@ export class AuthService {
             email: account.email,
             expiration: process.env.JWT_EXPIRES
         }
-
+        
         const refreshToken: refreshData = await this.generateRefreshToken({
-            username: account.username
+            username: account.username,
+            token: 'jwt'
         });
 
         const dataPaylaod: DataPayload = {
@@ -73,8 +84,25 @@ export class AuthService {
         return {
 
             username: data.username,
-            token: 'jwt',
+            token: data.token,
             refresh: Buffer.from(crypto.randomBytes(16)).toString('hex')
         }
     }
+
+    public async validateRefreshToken(token: string): Promise<DataPayload> {
+
+        const data: refreshData = decryptObject(token);
+        const user = await this.userService.findOnebyUserName(data.username);
+        if (!user) return null;
+
+        const jwtToken = await this.generateJwt(user);
+
+        return jwtToken;
+    }
 }
+
+const test = encryptObject({ username: 'test', token: 'jwt', refresh: 'just a simple token'});
+console.log(test);
+
+const dec = decryptObject(test);
+console.log(dec);
