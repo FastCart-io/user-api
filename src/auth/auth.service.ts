@@ -101,8 +101,3 @@ export class AuthService {
     }
 }
 
-const test = encryptObject({ username: 'test', token: 'jwt', refresh: 'just a simple token'});
-console.log(test);
-
-const dec = decryptObject(test);
-console.log(dec);
