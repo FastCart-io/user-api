@@ -12,4 +12,9 @@ export default () => ({
     expiresIn: process.env.JWT_EXPIRES,
   },
   client: {},
+  cache: {
+    host: process.env.REDIS_HOST,
+    prot: process.env.REDIS_PORT,
+    pass: process.env.REDIS_PASS
+  }
 });
