@@ -37,8 +37,11 @@ lerna-debug.log*
 # docker
 .docker/data/
 .docker/data/db/
-
+.docker/data/redis/
+.docker/redis/redis.conf
 #env
 .env.local
 .env.*
 .env
+
+.env.local
