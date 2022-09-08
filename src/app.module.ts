@@ -1,6 +1,8 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { CacheModule, forwardRef, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+
+import * as redisStore from 'cache-manager-redis-store';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,6 +11,7 @@ import { MongoUri_s } from './interfaces/mongo.interface';
 import { AuthModule } from './auth/auth.module';
 
 import configuration from './config/configuration';
+import { IRedis_conf } from './interfaces/redis.interface';
 
 @Module({
     imports: [
@@ -29,6 +32,14 @@ import configuration from './config/configuration';
             },
 
             inject: [ConfigService],
+        }),
+        
+        CacheModule.register({
+            isGlobal: true,
+            store: redisStore,
+            host: 'localhost',
+            port: 6380,
+            no_ready_check: true
         }),
 
         UserModule,
