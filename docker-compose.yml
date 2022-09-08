@@ -20,6 +20,13 @@ services:
     ports:
       - ${MONGO_PORT}:${MONGO_PORT}
 
+  serverCache:
+    image: redis:latest
+    restart: always
+    volumes: 
+      - ./.docker/data/cache:/data/cache
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
 networks:
   mongo_db:
 
