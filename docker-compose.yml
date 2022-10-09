@@ -21,7 +21,7 @@ services:
       - ${MONGO_PORT}:${MONGO_PORT}
 
   serverCache:
-    image: redis:latest
+    image: bitnami/redis:latest
     restart: always
     volumes: 
       - ./.docker/data/cache:/data/cache
@@ -29,9 +29,14 @@ services:
       - ${REDIS_PORT}:${REDIS_PORT}
     environment: 
       - REDIS_REPLICATION_MODE=master
+      - ALLOW_EMPTY_PASSWORD=yes
+      - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL,CONFIG
+      - REDIS_PORT_NUMBER=${REDIS_PORT}
+    networks:
+      - cache-network
 
 networks:
   mongo_db:
-
+  cache-network:
 volumes:
   data:
