@@ -27,13 +27,18 @@ export class AuthService {
     ) {}
 
     public async login(loginDto: LoginDto): Promise<DataPayload> | null {
+        
+        const cachedData = await this.cacheService.get(loginDto.credential.toString());
+        if (cachedData) {
+            
+            return await this.generateJwt(cachedData);
+        }
 
         let user: Partial<Account> | null = validateEmail(loginDto.credential) ?
             await this.userService.findOnebyEmail(loginDto.credential) :
             await this.userService.findOnebyUserName(loginDto.credential);
 
         if (!user) return null
-
         const account = await this.localCredential.validate({
 
             identifier: loginDto.credential,
@@ -41,26 +46,22 @@ export class AuthService {
         });
     
         const { username, password, createdAt, personalInfo } = account;
-
         if(!account) return null;
+
         const acc = new Account({
+
             username: username,
             password: password,
             createdAt: createdAt,
             personalInfo: personalInfo
         });
- 
-        console.log(user);
+
         await this.cacheService.setObject(user.username, acc); // seed with id ??
-        const cachedData = await this.cacheService.get(user.username.toString());
-
-        console.log('data set to cache', cachedData);
-
         return await this.generateJwt(acc);
     }
 
     public async validatePayload(payload: AccessPayload): Promise<Partial<IUser> | null> {
-
+        
         return await this.userService.findOnebyUserName(payload.username);
     }
     
