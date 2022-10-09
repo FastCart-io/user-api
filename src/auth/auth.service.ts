@@ -12,8 +12,6 @@ import { IUser } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
 import { LocalCredentialService } from './services/local-credential.service';
 
-import * as CacheService from 'cache-manager-redis-store';
-import { threadId } from 'node:worker_threads';
 import { RedisService } from 'src/cache/redis/redis.service';
 
 @Injectable()
