@@ -1,6 +1,16 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, HttpCode, Patch, Post, UseInterceptors } from '@nestjs/common';
+import {
+	Body,
+	ClassSerializerInterceptor,
+	Controller, 
+	HttpCode, 
+	Patch, 
+	Post, 
+	CacheInterceptor,
+	CacheKey,
+	CacheTTL,
+	UseInterceptors, 
+} from '@nestjs/common';
 import { ApiBadRequestResponse, ApiTags } from '@nestjs/swagger';
-import { DataPayload } from 'src/interfaces/payload.interface';
 import { Account } from 'src/user/dto/user.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
@@ -18,6 +28,10 @@ export class AuthController {
 	@Post('login')
 	@HttpCode(200)
 	@ApiBadRequestResponse({ description: 'Unable to login' })
+	
+	@UseInterceptors(CacheInterceptor)
+	@CacheTTL(60)
+	@CacheKey('user-me')
 	public async login(@Body() loginReqDto: LoginReqDto): Promise<any> {
 
 		return this.authService.login(loginReqDto)

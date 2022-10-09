@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 
 import configuration from './config/configuration';
 import { IRedis_conf } from './interfaces/redis.interface';
+import { RedisModule } from './cache/redis/redis.module';
 
 @Module({
     imports: [
@@ -33,15 +34,7 @@ import { IRedis_conf } from './interfaces/redis.interface';
 
             inject: [ConfigService],
         }),
-        
-        CacheModule.register({
-            isGlobal: true,
-            store: redisStore,
-            host: 'localhost',
-            port: 6380,
-            no_ready_check: true
-        }),
-
+        RedisModule,  
         UserModule,
         AuthModule,
     ],
