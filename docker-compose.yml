@@ -27,6 +27,9 @@ services:
       - ./.docker/data/cache:/data/cache
     ports:
       - ${REDIS_PORT}:${REDIS_PORT}
+    environment: 
+      - REDIS_REPLICATION_MODE=master
+
 networks:
   mongo_db:
 
