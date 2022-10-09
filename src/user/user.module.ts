@@ -5,9 +5,8 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { UserSchema } from 'src/schema/user.schema';
 import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
-import { LocalCredentialService } from 'src/auth/services/local-credential.service';
 import { AuthModule } from 'src/auth/auth.module';
-import { AsyncLocalStorage } from 'async_hooks';
+import { RedisModule } from 'src/cache/redis/redis.module';
 
 @Module({
     imports: [
@@ -17,8 +16,9 @@ import { AsyncLocalStorage } from 'async_hooks';
         	    schema: UserSchema
       	    }
     	]),
-
-         forwardRef(() => AuthModule),
+        
+        RedisModule,
+        forwardRef(() => AuthModule),
     ],
 
     providers: [UserService, JwtStrategy],

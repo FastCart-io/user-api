@@ -11,21 +11,24 @@ import { User } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
 import { Account, RegisterDto } from './dto/user.dto';
 import { LocalCredentialService } from 'src/auth/services/local-credential.service';
-
-import * as CacheService from 'cache-manager-redis-store'
+import { RedisService } from 'src/cache/redis/redis.service';
 
 @Injectable()
 export class UserService {
+
     constructor(
         @InjectModel('User') private readonly userModel: Model<User>,
         private readonly localCredService: LocalCredentialService,
+        private cacheService: RedisService,
     ) {}
 
     @UseInterceptors(ClassSerializerInterceptor)
     public async create(credentials: RegisterDto): Promise<Account | null> {
-        if (await this.findOnebyEmail(credentials.email)) return null;
 
-        if (await this.findOnebyUserName(credentials.username)) return null;
+        if (
+            await this.findOnebyEmail(credentials.email) || 
+            await this.findOnebyUserName(credentials.username)
+        ) return null;
 
         if (!validateEmail(credentials.email)) return null;
 
@@ -37,15 +40,18 @@ export class UserService {
         }
 
         const { username, password, email } = newUser;
-
-        return new Account({
+        const acc = new Account({
             username: username,
             email: email,
             password: password,
         });
+
+        this.cacheService.setObject(acc.username, acc);
+        return acc;
     }
 
     public async delete(account: Account): Promise<Partial<Account>> | null {
+        
         const user = await this.userModel.findOneAndDelete(account).exec();
 
         if (user) return new Account(user);
@@ -98,21 +104,39 @@ export class UserService {
     public async findOnebyEmail(
         email: string,
     ): Promise<Partial<Account>> | null {
+        
+        const cached = await this.cacheService.get(email) as Partial<Account>;
+        if (cached) return cached;
+
         const user: User = await this.userModel
             .findOne({ email: email })
             .exec();
-        if (user) return new Account(user);
-        else return null;
+        if (user) {
+
+            const acc = new Account(user);
+            this.cacheService.setObject(user.email, acc);
+            return acc;
+        }
+        
+        return null;
     }
 
     public async findOnebyUserName(
         username: string,
     ): Promise<Partial<Account>> | null {
+
+        const cached = await this.cacheService.get(username) as Partial<Account>;
+        if (cached) return cached;
+
         const user: User = await this.userModel
             .findOne({ username: username })
             .exec();
         if (!user) return null;
-        return user;
+        
+        const acc = new Account(user);
+        this.cacheService.setObject(acc.username, acc);
+        
+        return acc;
     }
 
     public async findOne(account: Account): Promise<Partial<Account>> | null {
