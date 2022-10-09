@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 
-import { IUser, User } from "src/interfaces/user.interface";
+import { User } from "src/interfaces/user.interface";
 import validateEmail from "src/middleware/email.checker";
-import { UserModel } from "src/schema/user.schema";
 import { Account } from "src/user/dto/user.dto";
 
 interface Credentials {
@@ -29,7 +28,8 @@ class LocalCredentialService {
         if(!user) return null;
         return user;
     }
-
+    
+    // Account isn't sent with hashed pswd
     public async validate(credentials: Credentials): Promise<Partial<Account> | null> {
 
         const {
