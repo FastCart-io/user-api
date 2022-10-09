@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto';
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt'
 
 import { UserService } from 'src/user/user.service';
@@ -12,13 +12,18 @@ import { IUser } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
 import { LocalCredentialService } from './services/local-credential.service';
 
+import * as CacheService from 'cache-manager-redis-store';
+import { threadId } from 'node:worker_threads';
+import { RedisService } from 'src/cache/redis/redis.service';
+
 @Injectable()
 export class AuthService {
 
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
-        private readonly localCredential: LocalCredentialService
+        private readonly localCredential: LocalCredentialService,
+        private cacheService: RedisService,
     ) {}
 
     public async login(loginDto: LoginDto): Promise<DataPayload> | null {
@@ -44,6 +49,12 @@ export class AuthService {
             createdAt: createdAt,
             personalInfo: personalInfo
         });
+ 
+        console.log(user);
+        await this.cacheService.setObject(user.username, acc); // seed with id ??
+        const cachedData = await this.cacheService.get(user.username.toString());
+
+        console.log('data set to cache', cachedData);
 
         return await this.generateJwt(acc);
     }

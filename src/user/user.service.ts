@@ -3,17 +3,16 @@ import {
     UseInterceptors,
     ClassSerializerInterceptor,
     Inject,
-    forwardRef
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { IUser, User } from 'src/interfaces/user.interface';
+import { User } from 'src/interfaces/user.interface';
 import validateEmail from 'src/middleware/email.checker';
 import { Account, RegisterDto } from './dto/user.dto';
-import * as Bcrypt from 'bcrypt';
 import { LocalCredentialService } from 'src/auth/services/local-credential.service';
-import { AuthService } from 'src/auth/auth.service';
+
+import * as CacheService from 'cache-manager-redis-store'
 
 @Injectable()
 export class UserService {
@@ -117,8 +116,8 @@ export class UserService {
     }
 
     public async findOne(account: Account): Promise<Partial<Account>> | null {
+        
         const user: User = await this.userModel.findOne(account).exec();
-
         if (user) return new Account(account);
 
         return null;

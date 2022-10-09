@@ -7,6 +7,7 @@ import {
     Patch,
     Request,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import {
     ApiBearerAuth,
@@ -29,6 +30,7 @@ export class UserController {
     @UseGuards(JwtGuard)
     @ApiUnauthorizedResponse({ description: 'Unauthorized' })
     public async getUser(@Request() req): Promise<any> {
+        
 
         return {
             status: 'sucess',
