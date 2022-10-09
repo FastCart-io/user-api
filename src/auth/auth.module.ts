@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
+import { RedisModule } from 'src/cache/redis/redis.module';
 
 import configuration from 'src/config/configuration';
 import { Jwt_s } from 'src/interfaces/jwt.interface';
@@ -42,7 +43,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
                 schema: UserSchema,
             },
         ]),
-
+        RedisModule,
         forwardRef(() => UserModule),
     ],
     exports: [AuthService, LocalCredentialService],
