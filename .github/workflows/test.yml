@@ -33,7 +33,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Install Dependencies
-        run: pnpm Install
+        run: pnpm install
 
       - name: Unit Testing
         run: pnpm test; pnpm test:cov
