@@ -1,0 +1,39 @@
+name: 'Unit Testing'
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ 'master', 'dev']
+  push:
+    branches:
+      - '**-test'
+      - 'master'
+      - 'dev'
+      - 'feat/**'
+    paths:
+      - 'test/**.spec.ts'
+      - 'test/**/**.spec.ts'
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 24
+      matrix:
+        node-version: [15]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Unit Testing
+        run: pnpm test; pnpm test:cov
