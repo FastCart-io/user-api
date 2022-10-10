@@ -23,9 +23,12 @@ export class AuthService {
         private readonly localCredential: LocalCredentialService,
         private cacheService: RedisService,
     ) {}
-
+    
+    /**
+     * the caching system here van be refafcto case there is a double use of get
+    **/
     public async login(loginDto: LoginDto): Promise<DataPayload> | null {
-        
+       
         const cachedData = await this.cacheService.get(loginDto.credential.toString());
         if (cachedData) {
             
@@ -54,7 +57,6 @@ export class AuthService {
             personalInfo: personalInfo
         });
 
-        await this.cacheService.setObject(user.username, acc); // seed with id ??
         return await this.generateJwt(acc);
     }
 
