@@ -31,6 +31,7 @@ specifiers:
   eslint-config-prettier: ^8.5.0
   eslint-plugin-prettier: ^4.2.1
   express: ^4.18.1
+  helmet: ^6.0.0
   jest: 28.0.3
   mongoose: ^6.5.5
   passport: ^0.6.0
@@ -66,6 +67,7 @@ dependencies:
   class-transformer: 0.5.1
   class-validator: 0.13.2
   express: 4.18.1
+  helmet: 6.0.0
   mongoose: 6.5.5
   passport: 0.6.0
   passport-jwt: 4.0.0
@@ -3094,6 +3096,11 @@ packages:
     engines: {node: '>= 0.4.0'}
     dependencies:
       function-bind: 1.1.1
+
+  /helmet/6.0.0:
+    resolution: {integrity: sha512-FO9RpR1wNJepH/GbLPQVtkE2eESglXL641p7SdyoT4LngHFJcZheHMoyUcjCZF4qpuMMO1u5q6RK0l9Ux8JBcg==}
+    engines: {node: '>=14.0.0'}
+    dev: false
 
   /hexoid/1.0.0:
     resolution: {integrity: sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==}
