@@ -1,6 +1,8 @@
-import { CacheModule, forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 import * as redisStore from 'cache-manager-redis-store';
 
@@ -11,7 +13,6 @@ import { MongoUri_s } from './interfaces/mongo.interface';
 import { AuthModule } from './auth/auth.module';
 
 import configuration from './config/configuration';
-import { IRedis_conf } from './interfaces/redis.interface';
 import { RedisModule } from './cache/redis/redis.module';
 
 @Module({
@@ -34,11 +35,26 @@ import { RedisModule } from './cache/redis/redis.module';
 
             inject: [ConfigService],
         }),
+        ThrottlerModule.forRootAsync({
+            useFactory: async () => {
+
+                return {
+                    ttl: 120,
+                    limit: 1200
+                }
+            }
+        }),
         RedisModule,  
         UserModule,
         AuthModule,
     ],
     controllers: [AppController],
-    providers: [AppService],
+    providers: [
+        AppService,
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard
+        }
+    ],
 })
 export class AppModule {}
