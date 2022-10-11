@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { RequestMethod, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
+
+import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { ConfigDocument, Options } from './config/swagger.config';
@@ -15,6 +16,8 @@ async function bootstrap() {
 
   app.enableCors();
   app.setGlobalPrefix('api/v1');
+  
+  app.use(helmet());
 
   const config = app.get<ConfigService>(ConfigService);
 
@@ -23,7 +26,6 @@ async function bootstrap() {
     ConfigDocument,
     Options.swaggerOptions,
   );
-
 
   SwaggerModule.setup('/api/v1/docs', app, document, Options);
   await app.listen(config.get<number>('PORT'));
