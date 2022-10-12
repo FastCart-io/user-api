@@ -86,7 +86,10 @@ export class UserService {
         try {
             const user = await this.localCredService.findOne(account.username);
             if (!user) return null;
-            await user.updatePassword(oldPass, newPass);
+            
+            if (await user.updatePassword(oldPass, newPass) != true)
+                return null;
+
             const { username, email, createdAt, personalInfo, password } = user;
 
             return new Account({
